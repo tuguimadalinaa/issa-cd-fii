@@ -1,0 +1,4 @@
+# Add required packages here
+# numpy
+# django>=2.2
+# etc
