@@ -7,11 +7,7 @@
  *
  */
 
-/** Note-1: Pay attention to the following comment for OS Path Separators adjustments
- *      <check-path-separator>
- */
-
-/** Note-2: Pay attention to the following comment for OS CLI Interpreter adjustments
+/** Note: Pay attention to the following comment for OS CLI Interpreter adjustments
  *      <check-cli-interpreter>
  */
 
@@ -23,21 +19,20 @@ pipeline {
     }
 
     environment {
-        VIRTUAL_ENV = "${env.WORKSPACE}\\venv\\Scripts"  // Windows
-        // VIRTUAL_ENV = "${env.WORKSPACE}/venv/bin"  // Linux
+        PATH = "${env.WORKSPACE}\\venv\\Scripts;${env.PATH}" // Use ':' for Linux, ';' for Windows as PATH Separators
     }
 
     stages {
         /** stage ('Declarative: Checkout SCM') { return } */
 
         stage ('Bootstrap') {
-            environment {
-                /** Add and modify the following line if python / pip are not recognized by Jenkins */
-                // PATH = "<path/to/python>:<path/to/pip>:${env.PATH}"  // Use ':' for Linux, ';' for Windows as PATH Separators
-                PATH = "C:\\Users\\uid33194\\AppData\\Local\\Programs\\Python\\Python37-32\\Scripts\\;C:\\Users\\uid33194\\AppData\\Local\\Programs\\Python\\Python37-32\\;${env.PATH}"         
-            }
             steps {
                 echo "PATH=${env.PATH}"
+                script {
+                    dir ('venv') {
+                        deleteDir()
+                    }
+                }
                 /** <check-cli-interpreter> */
                 bat """
                     python --version
@@ -46,12 +41,6 @@ pipeline {
                 bat """
                     pip install virtualenv
                 """
-                script {
-                    dir ('venv') {
-                        deleteDir()
-                    }
-                }
-                /** <check-cli-interpreter> */
                 bat """
                     virtualenv venv
                 """
@@ -59,9 +48,6 @@ pipeline {
         }
 
         stage ('Set-up') {
-            environment {
-                PATH = "${env.VIRTUAL_ENV};${env.PATH}" // Use ':' for Linux, ';' for Windows as PATH Separators
-            }
             steps {
                 bat """
                     pip install --upgrade pip
@@ -77,9 +63,6 @@ pipeline {
         }
 
         stage ('Static Code Analysis') {
-            environment {
-                PATH = "${env.VIRTUAL_ENV};${env.PATH}" // Use ':' for Linux, ';' for Windows as PATH Separators
-            }
             /** <check-cli-interpreter> */
             steps {
                 bat """
