@@ -31,7 +31,7 @@ pipeline {
                 script {
                     dir ('venv') {
                         deleteDir()
-                    }
+                    } 
                 }
                 /** <check-cli-interpreter> */
                 bat """
